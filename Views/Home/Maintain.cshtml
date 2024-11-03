@@ -1,0 +1,178 @@
+﻿@model u23689197_HW03.Models.MaintainViewModel
+@{
+    ViewBag.Title = "Maintain";
+}
+@using PagedList;
+@using PagedList.Mvc;
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="types">
+            <h2 class="text-primary">Types</h2>
+            <button class="btn btn-danger" id="add-new-type" data-url="@Url.Action("Create", "types")">Add New Type</button>
+            <table class="table table-bordered mt-2" style="background-color: #FFCAD4;">
+                <!-- Light Pink -->
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var type in Model.Types)
+                    {
+                        <tr>
+                            <td>@type.name</td>
+                            <td>
+                                <button class="btn btn-info btn-edit-type" data-url="@Url.Action("Edit", "types", new { id = type.typeId })">Edit</button>
+                                <button class="btn btn-danger btn-delete-type" data-url="@Url.Action("Delete", "types", new { id = type.typeId })">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @Html.PagedListPager(
+                Model.Types,
+                page => Url.Action("Maintain",
+                new
+                {
+                    pageTypes = page,
+                    pageAuthors = Request.QueryString["pageAuthors"],
+                    pageBorrows = Request.QueryString["pageBorrows"]
+                }))
+
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="authors">
+            <h2 class="text-primary">Authors</h2>
+            <button class="btn btn-danger" id="add-new-author" data-url="@Url.Action("Create", "authors")">Add New Author</button>
+            <table class="table table-bordered mt-2" style="background-color: #FFCAD4;">
+                <!-- Light Pink -->
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var author in Model.Authors)
+                    {
+                        <tr>
+                            <td>@author.name</td>
+                            <td> @author.surname</td>
+                            <td>
+                                <button class="btn btn-info btn-edit-author" data-url="@Url.Action("Edit", "authors", new { id = author.authorId })">Edit</button>
+                                <button class="btn btn-danger btn-delete-author" data-url="@Url.Action("Delete", "authors", new { id = author.authorId })">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @Html.PagedListPager(
+                Model.Authors,
+                page => Url.Action("Maintain",
+                new
+                {
+                    pageTypes = Request.QueryString["pageTypes"],
+                    pageAuthors = page,
+                    pageBorrows = Request.QueryString["pageBorrows"]
+                }))
+        </div>
+    </div>
+</div>
+
+<div class="borrows">
+    <h2 class="text-primary">Borrows</h2>
+    <button class="btn btn-secondary" id="add-new-borrow" data-url="@Url.Action("Create", "borrows")">Add New Borrow</button>
+    <table class="table table-bordered mt-2" style="background-color: #FFCAD4;">
+        <!-- Light Pink -->
+        <thead class="table-light">
+            <tr>
+                <th>Book</th>
+                <th>Student</th>
+                <th>Taken Date</th>
+                <th>Brought Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var borrow in Model.Borrows)
+            {
+                <tr>
+                    <td>@borrow.student.name</td>
+                    <td>@borrow.book.name</td>
+                    <td>@borrow.takenDate</td>
+                    <td>@(borrow.broughtDate?.ToString("MM/dd/yyyy") ?? "Not Returned")</td>
+                    <td>
+                        <button class="btn btn-info btn-edit-borrow" data-url="@Url.Action("Edit", "borrows", new { id = borrow.borrowId })">Edit</button>
+                        <button class="btn btn-danger btn-delete-borrow" data-url="@Url.Action("Delete", "borrows", new { id = borrow.borrowId })">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.PagedListPager(
+        Model.Borrows,
+        page => Url.Action("Maintain",
+        new
+        {
+            pageTypes = Request.QueryString["pageTypes"],
+            pageAuthors = Request.QueryString["pageAuthors"],
+            pageBorrows = page
+        }))
+</div>
+
+<!-- Modal for CRUD Operations -->
+<div id="myModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Library Item CRUD</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+        $(function () {
+            // Function to handle Edit, Detail, and Delete link click events
+            $(document).on("click", "#add-new-type, #add-new-author, #add-new-borrow, .btn-edit-type, .btn-edit-author, .btn-edit-borrow, .btn-delete-type, .btn-delete-author, .btn-delete-borrow", function (e) {
+                e.preventDefault();
+                var url = $(this).data("url");
+                console.log(url);
+
+                $.get(url, function (data) {
+                    $("#modal-content").empty();
+                    $("#modal-content").html(data);
+                    $("#myModal").modal("show");
+                });
+            });
+
+            // Function to handle form submission within the modal
+            $("#modal-content").on("submit", "form", function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr("action");
+                var formData = form.serialize();
+
+                $.post(url, formData, function (data) {
+                    $("#myModal").modal("hide");
+                    location.reload();
+                }).fail(function (xhr) {
+                    // Handle validation errors here
+                    if (xhr.status === 400) {
+                        $("#modal-content").html(xhr.responseText); // Show validation errors
+                    }
+                });
+            });
+        });
+    </script>
+}

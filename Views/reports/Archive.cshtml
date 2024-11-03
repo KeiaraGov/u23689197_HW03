@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Document Archive";
+}
+
+<h2>Document Archive</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var file in Model)
+        {
+            <tr>
+                <td>@file</td>
+                <td>
+                    <a href="@Url.Action("DownloadReport", "Reports", new { fileName = file })" class="btn btn-primary">Download</a>
+                    <form action="@Url.Action("DeleteReport", "Reports")" method="post" style="display:inline;">
+                        <input type="hidden" name="fileName" value="@file" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

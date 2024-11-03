@@ -1,0 +1,137 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.editable-description {
+    border: 1px solid #ddd;
+    padding: 5px;
+    min-height: 50px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    text-align: center;
+}
+
+
+/* General Styles */
+body {
+    background-color: #f8f9fa; /* Light background for better contrast */
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 8px; /* Rounded corners for cards */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    transition: transform 0.3s; /* Smooth transition for hover effect */
+}
+
+
+
+/* Table Styles */
+.table {
+    border-collapse: collapse; /* Removes double borders */
+}
+
+    .table th {
+        background-color: #007bff; /* Bootstrap primary color */
+        color: white; /* White text on header */
+        text-align: left; /* Align text to the left */
+        padding: 10px; /* Spacing inside header cells */
+    }
+
+    .table td {
+        padding: 10px; /* Spacing inside data cells */
+        border-bottom: 1px solid #dee2e6; /* Light border under cells */
+    }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .table {
+        font-size: 14px; /* Smaller font on mobile */
+    }
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 5px; /* Rounded buttons */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Darker secondary button */
+    border: none; /* Remove default border */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none; /* Remove default border */
+}
+
+/* Modal Styles */
+.modal-header {
+    background-color: #007bff; /* Header color for the modal */
+    color: white; /* White text for header */
+}
+
+.modal-title {
+    margin: 0; /* Remove default margin */
+}
+
+/* Hover Effects */
+.table tr:hover {
+    background-color: #e9ecef; /* Light gray background on row hover */
+}
+
+/* Pagination Styles */
+.pagination {
+    justify-content: center; /* Center pagination */
+    margin: 20px 0; /* Margin above and below pagination */
+}
+
+    .pagination a {
+        color: #007bff; /* Primary link color */
+    }
+
+        .pagination a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+

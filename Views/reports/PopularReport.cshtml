@@ -1,0 +1,180 @@
+﻿@model u23689197_HW03.Models.ReportViewModel
+
+@{
+    ViewBag.Title = "Popular Books Report and Document Archive";
+}
+
+<h2 class="text-primary" style="color: #9D8189;">Popular Reports</h2>
+
+<!-- Chart Section -->
+<div>
+    <canvas id="popularBooksChart"></canvas>
+</div>
+
+<!-- Save Report Form -->
+<div>
+    <form method="post" action="@Url.Action("SaveReport", "Reports")" onsubmit="captureChartImage()">
+        <label for="fileName">Filename:</label>
+        <input type="text" name="FileName" required />
+
+        <label for="fileType">File Type:</label>
+        <select name="FileType">
+            <option value="PDF">PDF</option>
+            <option value="CSV">CSV</option>
+            <option value="PNG">PNG</option>
+        </select>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="Description" class="resizable-textarea"></textarea>
+
+        <input type="hidden" id="ChartImage" name="ChartImage" />
+        <button type="submit">Save Report</button>
+    </form>
+</div>
+
+<!-- Document Archive Section -->
+<h2>Document Archive</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var file in ViewBag.ArchivedFiles as List<string>)
+        {
+            <tr>
+                <td>@file</td>
+                <td>
+                    <div class="editable-description" data-id="@file">
+                        @Html.Raw(ViewBag.Descriptions.ContainsKey(Path.GetFileNameWithoutExtension(file)) ? ViewBag.Descriptions[Path.GetFileNameWithoutExtension(file)] : "")
+                    </div>
+                </td>
+                <td>
+                    <a href="@Url.Action("DownloadReport", "Reports", new { fileName = file })" class="btn btn-primary">Download</a>
+                    <form action="@Url.Action("DeleteReport", "Reports")" method="post" style="display:inline;">
+                        <input type="hidden" name="fileName" value="@file" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        var ctx = document.getElementById('popularBooksChart').getContext('2d');
+        var popularBooksData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.BookBorrows));
+
+        var chartData = {
+            labels: popularBooksData.map(b => b.BookTitle),
+            datasets: [{
+                label: 'Borrow Count',
+                data: popularBooksData.map(b => b.BorrowCount),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function captureChartImage() {
+            const canvas = document.getElementById("popularBooksChart");
+            const chartImage = canvas.toDataURL("image/png");
+            document.getElementById("ChartImage").value = chartImage;
+        }
+
+        $(document).ready(function() {
+            $('.editable-description').resizable({
+                handles: 's',
+                minHeight: 50,
+                maxHeight: 200
+            });
+
+            $('.save-description').click(function() {
+                var reportId = $(this).data('id');
+                var description = $('.editable-description[data-id="' + reportId + '"]').html();
+                $.ajax({
+                    url: '@Url.Action("SaveDescription", "Reports")',
+                    type: 'POST',
+                    data: { id: reportId, description: description },
+                    success: function(result) {
+                        alert("Description saved successfully!");
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Custom Styles for Reports View */
+
+body {
+    background-color: #f8f9fa; /* Light background for contrast */
+    font-family: Arial, sans-serif; /* Change font */
+}
+
+h2 {
+    margin-bottom: 20px; /* Space below headings */
+}
+
+.form-control, .btn {
+    margin-bottom: 10px; /* Space between inputs and buttons */
+}
+
+.table {
+    margin-top: 20px; /* Space above tables */
+    border-radius: 8px; /* Rounded corners for tables */
+    overflow: hidden; /* To contain rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+}
+
+.table th {
+    background-color: #007bff; /* Primary color for headers */
+    color: white; /* Text color for headers */
+}
+
+.table tbody tr:hover {
+    background-color: #e9ecef; /* Light grey on row hover */
+}
+
+.alert {
+    margin-top: 20px; /* Space above alerts */
+}
+
+.editable-description {
+    min-height: 50px; /* Ensure minimum height for description boxes */
+    border: 1px solid #ced4da; /* Border for descriptions */
+    border-radius: 4px; /* Rounded corners */
+    padding: 8px; /* Padding inside descriptions */
+    background-color: white; /* White background for readability */
+}
+
+
+</style>
